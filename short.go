@@ -14,6 +14,7 @@ import (
 func main() {
   route := mux.NewRouter()
   route.HandleFunc("/{code}", RedirectToLongURL).Methods("GET")
+  route.HandleFunc("/", RenderForm).Methods("GET")
   route.HandleFunc("/", MakeShortURL).Methods("POST")
 
   http.Handle("/", route)
@@ -41,6 +42,10 @@ func RedirectToLongURL(res http.ResponseWriter, req *http.Request) {
   client.Close()
 
   http.Redirect(res, req, longUrl, 302)
+}
+
+func RenderForm(res http.ResponseWriter, req *http.Request) {
+  fmt.Fprintln(res, "<html><body><form method=\"post\"><input name=\"url\" type=\"text\"><input type=\"submit\"></form></body>")
 }
 
 func randomHex(n int) (string, error) {
