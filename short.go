@@ -4,10 +4,11 @@ import (
   "crypto/rand"
   "encoding/hex"
   "fmt"
-  "github.com/fzzy/radix/redis"
   "github.com/gorilla/mux"
   "net/http"
   "os"
+  "github.com/soveran/redisurl"
+  "github.com/garyburd/redigo/redis"
 )
 
 func main() {
@@ -26,8 +27,11 @@ func main() {
 
 func redir(res http.ResponseWriter, req *http.Request) {
   code := req.URL.Path[1:]
-  client, _ := redis.Dial("tcp", os.Getenv("REDISCLOUD_URL"))
-  longUrl, _ := client.Cmd("GET", code).Str()
+
+  client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
+  longUrl, _ := redis.String(client.Do("GET", code))
+  client.Close()
+
   http.Redirect(res, req, longUrl, 302)
 }
 
@@ -38,8 +42,9 @@ func short(res http.ResponseWriter, req *http.Request) {
 
 func makeShort(longUrl string) (string) {
   code, _ := randomHex(5)
-  client, _ := redis.Dial("tcp", os.Getenv("REDISCLOUD_URL"))
-  client.Cmd("SET", code, longUrl)
+  client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
+  client.Do("SET", code, longUrl)
+  client.Close()
   return os.Getenv("HOST") + "/" + code
 }
 

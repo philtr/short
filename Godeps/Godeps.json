@@ -3,9 +3,12 @@
 	"GoVersion": "go1.4",
 	"Deps": [
 		{
-			"ImportPath": "github.com/fzzy/radix/redis",
-			"Comment": "v0.5.1",
-			"Rev": "27a863cdffdb0998d13e1e11992b18489aeeaa25"
+			"ImportPath": "github.com/garyburd/redigo/internal",
+			"Rev": "61e2910408efd40dafb3c7d856a4cf8aeb5fb1c6"
+		},
+		{
+			"ImportPath": "github.com/garyburd/redigo/redis",
+			"Rev": "61e2910408efd40dafb3c7d856a4cf8aeb5fb1c6"
 		},
 		{
 			"ImportPath": "github.com/gorilla/context",
@@ -14,6 +17,10 @@
 		{
 			"ImportPath": "github.com/gorilla/mux",
 			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
+		},
+		{
+			"ImportPath": "github.com/soveran/redisurl",
+			"Rev": "ac42ec99510b5f21d11560d316adcc5bc41f0915"
 		}
 	]
 }
