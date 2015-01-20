@@ -38,6 +38,15 @@ func RenderForm(r render.Render) {
   r.HTML(200, "form", "")
 }
 
+func findCode(longUrl string) (string) {
+  client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
+  code, _ := redis.String(client.Do("GET", longUrl))
+  client.Close()
+
+  return code
+}
+
+
 func findLink(code string) (string) {
   client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
   longUrl, _ := redis.String(client.Do("GET", code))
@@ -55,13 +64,20 @@ func randomHex(n int) (string, error) {
 }
 
 func saveLink(longUrl string) (string){
-  code, _ := randomHex(5)
-  go writeLink(code, longUrl)
+  code := findCode(longUrl)
+
+  if code == "" {
+    code, _ := randomHex(2)
+    go writeLink(code, longUrl)
+    return code
+  }
+
   return code
 }
 
 func writeLink(code string, longUrl string) {
   client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
   client.Do("SET", code, longUrl)
+  client.Do("SET", longUrl, code)
   client.Close()
 }
