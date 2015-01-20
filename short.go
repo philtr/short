@@ -3,49 +3,47 @@ package main
 import (
   "crypto/rand"
   "encoding/hex"
-  "fmt"
   "github.com/garyburd/redigo/redis"
-  "github.com/gorilla/mux"
+  "github.com/go-martini/martini"
+  "github.com/martini-contrib/render"
   "github.com/soveran/redisurl"
   "net/http"
   "os"
 )
 
 func main() {
-  route := mux.NewRouter()
-  route.HandleFunc("/{code}", RedirectToLongURL).Methods("GET")
-  route.HandleFunc("/", RenderForm).Methods("GET")
-  route.HandleFunc("/", MakeShortURL).Methods("POST")
+  m := martini.Classic()
+  m.Use(render.Renderer())
 
-  http.Handle("/", route)
+  m.Get("/", RenderForm)
+  m.Get("/:code", RedirectToLongURL)
+  m.Post("/", MakeShortURL)
 
-  fmt.Println("Listening...")
-  err := http.ListenAndServe(":" + os.Getenv("PORT"), nil)
-  if err != nil {
-    panic(err)
-  }
+  m.Run()
 }
 
-func MakeShortURL(res http.ResponseWriter, req *http.Request) {
+func MakeShortURL(req *http.Request) (string) {
   longUrl := req.FormValue("url")
-  code, _ := randomHex(5)
-  client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
-  client.Do("SET", code, longUrl)
-  client.Close()
-  fmt.Fprintln(res, os.Getenv("HOST") + "/" + code)
+  code := saveLink(longUrl)
+  shortUrl := os.Getenv("SHORTURL_HOST") + "/" + code
+
+  return shortUrl
 }
 
-func RedirectToLongURL(res http.ResponseWriter, req *http.Request) {
-  code := req.URL.Path[1:]
+func RedirectToLongURL(params martini.Params, r render.Render) {
+  r.Redirect(findLink(params["code"]), 302)
+}
+
+func RenderForm(r render.Render) {
+  r.HTML(200, "form", "")
+}
+
+func findLink(code string) (string) {
   client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
   longUrl, _ := redis.String(client.Do("GET", code))
   client.Close()
 
-  http.Redirect(res, req, longUrl, 302)
-}
-
-func RenderForm(res http.ResponseWriter, req *http.Request) {
-  fmt.Fprintln(res, "<html><body><form method=\"post\"><input name=\"url\" type=\"text\"><input type=\"submit\"></form></body>")
+  return longUrl
 }
 
 func randomHex(n int) (string, error) {
@@ -56,3 +54,14 @@ func randomHex(n int) (string, error) {
   return hex.EncodeToString(bytes), nil
 }
 
+func saveLink(longUrl string) (string){
+  code, _ := randomHex(5)
+  go writeLink(code, longUrl)
+  return code
+}
+
+func writeLink(code string, longUrl string) {
+  client, _ := redisurl.ConnectToURL(os.Getenv("REDISCLOUD_URL"))
+  client.Do("SET", code, longUrl)
+  client.Close()
+}

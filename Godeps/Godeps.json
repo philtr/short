@@ -3,6 +3,11 @@
 	"GoVersion": "go1.4",
 	"Deps": [
 		{
+			"ImportPath": "github.com/codegangsta/inject",
+			"Comment": "v1.0-rc1-10-g33e0aa1",
+			"Rev": "33e0aa1cb7c019ccc3fbe049a8262a6403d30504"
+		},
+		{
 			"ImportPath": "github.com/garyburd/redigo/internal",
 			"Rev": "61e2910408efd40dafb3c7d856a4cf8aeb5fb1c6"
 		},
@@ -11,12 +16,17 @@
 			"Rev": "61e2910408efd40dafb3c7d856a4cf8aeb5fb1c6"
 		},
 		{
-			"ImportPath": "github.com/gorilla/context",
-			"Rev": "215affda49addc4c8ef7e2534915df2c8c35c6cd"
+			"ImportPath": "github.com/go-martini/martini",
+			"Comment": "v1.0-85-gbbd489b",
+			"Rev": "bbd489b35fd7eac9aaf442e5671ab21cdd972926"
 		},
 		{
-			"ImportPath": "github.com/gorilla/mux",
-			"Rev": "e444e69cbd2e2e3e0749a2f3c717cec491552bbf"
+			"ImportPath": "github.com/martini-contrib/render",
+			"Rev": "b65063311fac6cbf84d3538f5715f7847e648322"
+		},
+		{
+			"ImportPath": "github.com/oxtoacart/bpool",
+			"Rev": "923fab21d0624a469b877a05bbfc562c1c26c663"
 		},
 		{
 			"ImportPath": "github.com/soveran/redisurl",
