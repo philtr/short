@@ -19,8 +19,8 @@ func (l *Link) shortUrl() string {
 
 func (l *Link) save() {
   if l.code == "" {
-    code := FindByLongUrl(l.longUrl).code
-    if code == "" {
+    l.code = FindByLongUrl(l.longUrl).code
+    if l.code == "" {
       l.code, _ = randomHex(2)
       go writeLink(l)
     }
